@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { AppRegistry, StyleSheet, Text, View, TextInput } from 'react-native';
+
+// --- global variables --- //
+// keeps track of the views that contain info on numbers converting to
+// e.g.: { 2: binaryNumberInputViewObject }
+var inputViews = {};
 
 class NumberInputView extends Component {
   constructor(props) {
@@ -8,11 +13,13 @@ class NumberInputView extends Component {
       8: "Oct",
       10: "Dec",
       16: "Hex",
-    }
-    props.label = labels[props.numberBase];
-
+    };
+    // props.label = labels[props.numberBase];
+    
     super(props);
     this.state = {text: ''};
+
+    inputViews[this.props.numberBase] = this;
 
     // used in regex pattern that matches non-accepted characters
     this.validDigits = "";
@@ -44,6 +51,24 @@ class NumberInputView extends Component {
           onChangeText={(text) => this.setState(
             state=(prevState, props) => {
               return {text: this.filterInput(text)}
+            },
+            callback=() => {
+              for (toBase in inputViews) {
+                
+                if (toBase == this.props.numberBase) {
+                  continue;
+                }
+                let numberInputView = inputViews[toBase];
+                numberInputView.setState(
+                  state=(prevState, props) => {
+                    return {text: NumberInputController.convert(
+                      this.state.text,
+                      this.props.numberBase,
+                      toBase
+                    )}
+                  }
+                )
+              }
             })
           }
           value={this.state.text}
@@ -61,6 +86,7 @@ class NumberInputController {
       return this._convertToDecimal(value, fromBase);
     } else if (fromBase == "2" || toBase == "2") {
       // e.g.: 2A -> 42 -> 101010
+      // e.g.: 101010 -> 42 -> 2A
       return this._convertFromDecimal(
         this._convertToDecimal(value, fromBase),
         toBase
@@ -129,7 +155,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'lightblue',
-    borderRadius: 10,
+    borderRadius: 0,
     padding: 0,
     marginTop: 10,
   },
@@ -154,3 +180,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
+
+
+// entry point
+AppRegistry.registerComponent('base_converter', () => App);
