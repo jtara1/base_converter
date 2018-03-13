@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { AppRegistry, StyleSheet, Text, View, TextInput } from 'react-native';
+import _ from 'lodash';
 
 // --- global variables --- //
 // keeps track of the views that contain info on numbers converting to
@@ -14,18 +15,30 @@ class NumberInputView extends Component {
       10: "Dec",
       16: "Hex",
     };
-    // props.label = labels[props.numberBase];
+    // props["label"] = labels[props.numberBase];
     
     super(props);
     this.state = {text: ''};
 
     inputViews[this.props.numberBase] = this;
 
+    // English alphabet [A, B, C, ..., Z] is 26 characters
+    let alphabet = _.map(
+      _.map(
+        _.range(26), 
+        (x) => x + 65),
+      (x) => String.fromCharCode(x));
+    
+    // [0, 1, ..., 9, A, B, C, ..., Z]
+    let alphanumericCharacters = _.concat(_.range(10), alphabet);
+
     // used in regex pattern that matches non-accepted characters
     this.validDigits = "";
-    for (let i = 0; i < this.props.numberBase; i++) {
-      this.validDigits += i;
+    // console.log(alphanumericCharacters);
+    for (let i = 0; i < this.props.numberBase; i++) {      
+      this.validDigits += alphanumericCharacters[i];
     }
+    console.log(this.validDigits);
   }
 
   /**
@@ -34,9 +47,11 @@ class NumberInputView extends Component {
    */
   filterInput(input) {
     // console.log(this.validDigits);
+    input = input.toUpperCase();
     console.log('input: ' + input);
     console.log('state.text: ' + this.state.text);
-    let pattern = new RegExp("[^" + this.validDigits + "]*");
+    let pattern = new RegExp("[^" + this.validDigits + "]*", 'g');
+    console.log(pattern);
     let filteredInput = input.replace(pattern, "");
     return filteredInput;
   }
@@ -54,7 +69,6 @@ class NumberInputView extends Component {
             },
             callback=() => {
               for (toBase in inputViews) {
-                
                 if (toBase == this.props.numberBase) {
                   continue;
                 }
@@ -65,7 +79,7 @@ class NumberInputView extends Component {
                       this.state.text,
                       this.props.numberBase,
                       toBase
-                    )}
+                    )};
                   }
                 )
               }
