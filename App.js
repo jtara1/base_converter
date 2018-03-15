@@ -36,6 +36,7 @@ class NumberInputView extends Component {
     this.state = {text: ''};
     // name or label associated with the numberBase
     this.label = NumberInputView.labels[this.props.numberBase];
+    this.keyboardType = this.props.numberBase <= 10 ? 'numeric' : 'default';
 
     NumberInputView.inputViews[this.props.numberBase] = this;
 
@@ -66,6 +67,8 @@ class NumberInputView extends Component {
         <TextInput
           placeholder={"enter number here"}
           style={styles.textInput}
+          value={this.state.text}
+          keyboardType={this.keyboardType}
           onChangeText={(text) => this.setState(
             state=(prevState, props) => {
               return {text: this.filterInput(text)}
@@ -102,7 +105,6 @@ class NumberInputView extends Component {
               }
             })
           }
-          value={this.state.text}
         />
       </View>
     );
