@@ -2,41 +2,47 @@ import React, { Component } from 'react';
 import { AppRegistry, StyleSheet, Text, View, TextInput } from 'react-native';
 import _ from 'lodash';
 
-// --- global variables --- //
-// keeps track of the views that contain info on numbers converting to
-// e.g.: { 2: binaryNumberInputViewObject }
-var inputViews = {};
-
+/**
+ * Renders a view that contains an input field that will filter
+ * the input from the user and update the other instances of this
+ * class with the converted number.
+ * Instances are associated with a specific numberBase.
+ */
 class NumberInputView extends Component {
-  constructor(props) {
-    let labels = {
-      2: "Bin",
-      8: "Oct",
-      10: "Dec",
-      16: "Hex",
-    };    
+  // map numberBase to label
+  static labels = {
+    2: "Bin",
+    8: "Oct",
+    10: "Dec",
+    16: "Hex",
+  };    
 
-    super(props);
-    this.state = {text: ''};
-    this.label = labels[this.props.numberBase];
-
-    inputViews[this.props.numberBase] = this;
-
+  // keeps track of the views that contain info on numbers converting to
+  // e.g.: { 2: binaryNumberInputViewObject }
+  static inputViews = {};
+  
+  // [0, 1, ..., 9, A, B, C, ..., Z]
+  static alphanumericCharacters = _.concat(
+    _.range(10), 
     // English alphabet [A, B, C, ..., Z] is 26 characters
-    let alphabet = _.map(
+    _.map(
       _.map(
         _.range(26), 
         (x) => x + 65),
-      (x) => String.fromCharCode(x));
-    
-    // [0, 1, ..., 9, A, B, C, ..., Z]
-    let alphanumericCharacters = _.concat(_.range(10), alphabet);
+      (x) => String.fromCharCode(x)));
+
+  constructor(props) {
+    super(props);
+    this.state = {text: ''};
+    // name or label associated with the numberBase
+    this.label = NumberInputView.labels[this.props.numberBase];
+
+    NumberInputView.inputViews[this.props.numberBase] = this;
 
     // used in regex pattern that matches non-accepted characters
-    this.validDigits = "";
-    for (let i = 0; i < this.props.numberBase; i++) {      
-      this.validDigits += alphanumericCharacters[i];
-    }
+    this.validDigits = NumberInputView.alphanumericCharacters
+      .slice(0, this.props.numberBase)
+      .join('');
     console.log(this.validDigits);
   }
 
@@ -65,7 +71,7 @@ class NumberInputView extends Component {
               return {text: this.filterInput(text)}
             },
             callback=() => {
-              for (toBase in inputViews) {
+              for (toBase in NumberInputView.inputViews) {
                 if (toBase == this.props.numberBase || toBase == 'undefined') {
                   // console.log('not converting toBase: ' + toBase);
                   continue;
@@ -83,7 +89,7 @@ class NumberInputView extends Component {
                 console.log('converting to: ' + toBase);
                 console.log('converted value: ' + convertedValue);
 
-                let numberInputView = inputViews[toBase];
+                let numberInputView = NumberInputView.inputViews[toBase];
                 numberInputView.setState(
                   state=(prevState, props) => {
                     return {text: convertedValue};
