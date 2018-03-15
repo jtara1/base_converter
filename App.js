@@ -9,14 +9,14 @@ var inputViews = {};
 
 class NumberInputView extends Component {
   constructor(props) {
-    let labels = {
-      2: "Bin",
-      8: "Oct",
-      10: "Dec",
-      16: "Hex",
-    };
+    // let labels = {
+    //   2: "Bin",
+    //   8: "Oct",
+    //   10: "Dec",
+    //   16: "Hex",
+    // };    
     // props["label"] = labels[props.numberBase];
-    
+
     super(props);
     this.state = {text: ''};
 
@@ -34,7 +34,6 @@ class NumberInputView extends Component {
 
     // used in regex pattern that matches non-accepted characters
     this.validDigits = "";
-    // console.log(alphanumericCharacters);
     for (let i = 0; i < this.props.numberBase; i++) {      
       this.validDigits += alphanumericCharacters[i];
     }
@@ -42,16 +41,14 @@ class NumberInputView extends Component {
   }
 
   /**
-   * Take the value, this.props.value and remove unaccepted characters
    * @param {string} input 
+   * @returns {string} input with removed unaccepted characters
    */
   filterInput(input) {
-    // console.log(this.validDigits);
     input = input.toUpperCase();
     console.log('input: ' + input);
-    console.log('state.text: ' + this.state.text);
+    
     let pattern = new RegExp("[^" + this.validDigits + "]*", 'g');
-    console.log(pattern);
     let filteredInput = input.replace(pattern, "");
     return filteredInput;
   }
@@ -65,23 +62,36 @@ class NumberInputView extends Component {
           style={styles.textInput}
           onChangeText={(text) => this.setState(
             state=(prevState, props) => {
+              prevChanger = this.props.numberBase;
+              this.textChangedBySelf = true;
               return {text: this.filterInput(text)}
             },
             callback=() => {
               for (toBase in inputViews) {
-                if (toBase == this.props.numberBase) {
+                if (toBase == this.props.numberBase || toBase == 'undefined') {
+                  // console.log('not converting toBase: ' + toBase);
                   continue;
                 }
+
+                let convertedValue = NumberInputController.convert(
+                  this.state.text,
+                  this.props.numberBase,
+                  toBase
+                ).toString();
+
+                console.log('---debug---');
+                console.log('converting value: ' + this.state.text);
+                console.log('converting from: ' + this.props.numberBase);
+                console.log('converting to: ' + toBase);
+                console.log('converted value: ' + convertedValue);
+
                 let numberInputView = inputViews[toBase];
                 numberInputView.setState(
                   state=(prevState, props) => {
-                    return {text: NumberInputController.convert(
-                      this.state.text,
-                      this.props.numberBase,
-                      toBase
-                    )};
+                    return {text: convertedValue};
                   }
                 )
+                this.textChangedBySelf = false;
               }
             })
           }
@@ -117,11 +127,12 @@ class NumberInputController {
   }
 }
 
+/**
+ * Root Component for my app
+ */
 export default class App extends Component {
   constructor(props) {
     super(props);
-
-    this.inputController = null;
   }
 
   render() {
@@ -131,9 +142,17 @@ export default class App extends Component {
           <Text style={styles.title}>Base Converter</Text>
         </View>
         <NumberInputView
-          label={"Bin"}
+          label={"bin"}
           numberBase={2}
         />
+        {/* <NumberInputView
+          label={"Oct"}
+          numberBase={8}
+        />
+        <NumberInputView
+          label={"Dec"}
+          numberBase={10}
+        /> */}
         <NumberInputView
           label={"Hex"}
           numberBase={16}
@@ -177,7 +196,7 @@ const styles = StyleSheet.create({
   // view used for label
   inputLabel: {
     alignItems: 'center',
-    lineHeight: 200,
+    lineHeight: 150,
     flex: 0.3,
     textAlign: 'center',
     padding: 0,
@@ -194,7 +213,3 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-
-
-// entry point
-AppRegistry.registerComponent('base_converter', () => App);
