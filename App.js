@@ -62,8 +62,6 @@ class NumberInputView extends Component {
           style={styles.textInput}
           onChangeText={(text) => this.setState(
             state=(prevState, props) => {
-              prevChanger = this.props.numberBase;
-              this.textChangedBySelf = true;
               return {text: this.filterInput(text)}
             },
             callback=() => {
@@ -73,11 +71,11 @@ class NumberInputView extends Component {
                   continue;
                 }
 
-                let convertedValue = NumberInputController.convert(
+                let convertedValue = NumberConverter.convert(
                   this.state.text,
                   this.props.numberBase,
                   toBase
-                ).toString();
+                ).toString().toUpperCase();
 
                 console.log('---debug---');
                 console.log('converting value: ' + this.state.text);
@@ -91,7 +89,6 @@ class NumberInputView extends Component {
                     return {text: convertedValue};
                   }
                 )
-                this.textChangedBySelf = false;
               }
             })
           }
@@ -102,19 +99,28 @@ class NumberInputView extends Component {
   }
 }
 
-class NumberInputController {
+class NumberConverter {
+
+  /**
+   * Tested and working with conversions between bin, dec, oct, and hex
+   * values
+   * @param {*} value number we are converting
+   * @param {*} fromBase the base of the number, value
+   * @param {*} toBase the base that we'd like to convert to
+   * @returns {integer} the converted value of base toBase
+   */
   static convert(value, fromBase, toBase) {  
     if (fromBase == "10") {
-      return this._convertFromDecimal(value, toBase);
+      return NumberConverter._convertFromDecimal(value, toBase);
     } else if (toBase == "10") {
-      return this._convertToDecimal(value, fromBase);
-    } else if (fromBase == "2" || toBase == "2") {
+      return NumberConverter._convertToDecimal(value, fromBase);
+    } else {
       // e.g.: 2A -> 42 -> 101010
       // e.g.: 101010 -> 42 -> 2A
-      return this._convertFromDecimal(
-        this._convertToDecimal(value, fromBase),
+      return NumberConverter._convertFromDecimal(
+        NumberConverter._convertToDecimal(value, fromBase),
         toBase
-      ).toString();
+      );
     }
   }
 
@@ -128,7 +134,7 @@ class NumberInputController {
 }
 
 /**
- * Root Component for my app
+ * Root Component and entry point for my app
  */
 export default class App extends Component {
   constructor(props) {
@@ -142,17 +148,17 @@ export default class App extends Component {
           <Text style={styles.title}>Base Converter</Text>
         </View>
         <NumberInputView
-          label={"bin"}
+          label={"Bin"}
           numberBase={2}
         />
-        {/* <NumberInputView
+        <NumberInputView
           label={"Oct"}
           numberBase={8}
         />
         <NumberInputView
           label={"Dec"}
           numberBase={10}
-        /> */}
+        />
         <NumberInputView
           label={"Hex"}
           numberBase={16}
