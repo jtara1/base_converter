@@ -15,7 +15,7 @@ class NumberInputView extends Component {
     8: "Oct",
     10: "Dec",
     16: "Hex",
-  };    
+  };
 
   // keeps track of the views that contain info on numbers converting to
   // e.g.: { 2: binaryNumberInputViewObject }
@@ -37,6 +37,7 @@ class NumberInputView extends Component {
     // name or label associated with the numberBase
     this.label = NumberInputView.labels[this.props.numberBase];
     this.keyboardType = this.props.numberBase <= 10 ? 'numeric' : 'default';
+    this.autoFocus = this.props["autoFocus"] == 'undefined' ? false : this.props.autoFocus;
 
     NumberInputView.inputViews[this.props.numberBase] = this;
 
@@ -65,18 +66,22 @@ class NumberInputView extends Component {
       <View style={styles.inputView}>
         <Text style={styles.inputLabel}>{this.label}</Text>
         <TextInput
+          autoFocus={this.autoFocus}
           placeholder={"enter number here"}
           style={styles.textInput}
+          placeholderTextColor={"#000000"}
           value={this.state.text}
           keyboardType={this.keyboardType}
           onChangeText={(text) => this.setState(
             state=(prevState, props) => {
-              return {text: this.filterInput(text)}
+              let filteredInput = this.filterInput(text);
+              console.log('filteredInput: ' + filteredInput);
+              return {text: filteredInput};
             },
             callback=() => {
               for (toBase in NumberInputView.inputViews) {
                 if (toBase == this.props.numberBase || toBase == 'undefined') {
-                  // console.log('not converting toBase: ' + toBase);
+                  console.log('not converting toBase: ' + toBase);
                   continue;
                 }
 
@@ -160,6 +165,7 @@ export default class App extends Component {
           <Text style={styles.title}>Base Converter</Text>
         </View>
         <NumberInputView
+          autoFocus={false}
           numberBase={2}
         />
         <NumberInputView
@@ -169,6 +175,7 @@ export default class App extends Component {
           numberBase={10}
         />
         <NumberInputView
+          autoFocus={true}
           numberBase={16}
         />
       </View>
