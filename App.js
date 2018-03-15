@@ -77,12 +77,16 @@ class NumberInputView extends Component {
                   continue;
                 }
 
-                let convertedValue = NumberConverter.convert(
+                // converting an empty string would return NaN, but
+                // we want to print empty string for converted values
+                let convertedValue = this.state.text === '' ? 
+                  '':
+                  NumberConverter.convert(
                   this.state.text,
                   this.props.numberBase,
                   toBase
-                ).toString().toUpperCase();
-
+                  ).toString().toUpperCase();
+                  
                 console.log('---debug---');
                 console.log('converting value: ' + this.state.text);
                 console.log('converting from: ' + this.props.numberBase);
