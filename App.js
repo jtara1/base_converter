@@ -9,16 +9,16 @@ var inputViews = {};
 
 class NumberInputView extends Component {
   constructor(props) {
-    // let labels = {
-    //   2: "Bin",
-    //   8: "Oct",
-    //   10: "Dec",
-    //   16: "Hex",
-    // };    
-    // props["label"] = labels[props.numberBase];
+    let labels = {
+      2: "Bin",
+      8: "Oct",
+      10: "Dec",
+      16: "Hex",
+    };    
 
     super(props);
     this.state = {text: ''};
+    this.label = labels[this.props.numberBase];
 
     inputViews[this.props.numberBase] = this;
 
@@ -56,7 +56,7 @@ class NumberInputView extends Component {
   render() {
     return (
       <View style={styles.inputView}>
-        <Text style={styles.inputLabel}>{this.props.label}</Text>
+        <Text style={styles.inputLabel}>{this.label}</Text>
         <TextInput
           placeholder={"enter number here"}
           style={styles.textInput}
@@ -148,19 +148,15 @@ export default class App extends Component {
           <Text style={styles.title}>Base Converter</Text>
         </View>
         <NumberInputView
-          label={"Bin"}
           numberBase={2}
         />
         <NumberInputView
-          label={"Oct"}
           numberBase={8}
         />
         <NumberInputView
-          label={"Dec"}
           numberBase={10}
         />
         <NumberInputView
-          label={"Hex"}
           numberBase={16}
         />
       </View>
