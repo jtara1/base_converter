@@ -79,7 +79,7 @@ class NumberInputView extends Component {
     console.log(validDigits);
 
     // match all characters that are not valid digits for this numberBase
-    this.unAcceptedCharacterRegex = new RegExp("[^" + validDigits + "]*", "g");
+    this.unAcceptedCharacterRegex = new RegExp("[^" + validDigits + "." + "]*", "g");
   }
 
   /**
@@ -149,37 +149,80 @@ class NumberInputView extends Component {
   }
 }
 
+/**
+ * Utility class that helps convert floating point or integers of one base
+ * to the equivalent value of another base
+ */
 class NumberConverter {
-
   /**
    * Tested and working with conversions between bin, dec, oct, and hex
-   * values
-   * @param {*} value number we are converting
+   * values for floating point and integer values
+   * @param {string} value number we are converting
    * @param {*} fromBase the base of the number, value
    * @param {*} toBase the base that we'd like to convert to
-   * @returns {integer} the converted value of base toBase
+   * @returns {*} the converted value of base toBase
    */
   static convert(value, fromBase, toBase) {  
+    let valueSplit = value.split(".");
+    let preFP = valueSplit[0];
+    let postFP = valueSplit[1];
+
     if (fromBase == "10") {
       return NumberConverter._convertFromDecimal(value, toBase);
     } else if (toBase == "10") {
-      return NumberConverter._convertToDecimal(value, fromBase);
+      return NumberConverter._convertToFloatingPointDecimal(preFP, postFP, fromBase, toBase);
     } else {
       // e.g.: 2A -> 42 -> 101010
       // e.g.: 101010 -> 42 -> 2A
       return NumberConverter._convertFromDecimal(
-        NumberConverter._convertToDecimal(value, fromBase),
+        NumberConverter._convertToFloatingPointDecimal(preFP, postFP, fromBase, toBase),
         toBase
       );
     }
   }
 
+  /**
+   * @param {*} value 
+   * @param {*} toBase 
+   * @returns converted FP or integeral value of base 10 to any base specified by toBase
+   */
   static _convertFromDecimal(value, toBase) {
     return (new Number(value)).toString(toBase);
   }
 
+  /**
+   * @param {*} value 
+   * @param {*} fromBase 
+   * @returns converted integer value of any base, fromBase, to base 10
+   */
   static _convertToDecimal(value, fromBase) {
     return parseInt(value, fromBase);
+  }
+
+  /**
+   * @param {*} preFP digits before the floating point
+   * @param {*} postFP digits after the floating point
+   * @param {*} fromBase 
+   * @param {*} toBase 
+   * @returns converted integer value of any base, fromBase, to any base, toBase
+   */
+  static _convertToFloatingPointDecimal(preFP, postFP, fromBase, toBase) {
+    return NumberConverter._convertToDecimal(preFP, fromBase) + 
+      NumberConverter._parseFloat(postFP, fromBase, toBase);
+  }
+
+  /**
+   * @param {*} postFP digits after the floating point
+   * @param {*} fromBase 
+   * @param {*} toBase 
+   * @returns the post floating point digits of base, toBase
+   */
+  static _parseFloat(postFP, fromBase, toBase) {
+    let parsedFloat = this._convertToDecimal(postFP, fromBase,) / 
+      Math.pow(fromBase, (new Number(postFP)).toString().length);
+
+    parsedFloat.toPrecision(4);
+    return isNaN(parsedFloat) ? 0 : parsedFloat;
   }
 }
 
@@ -194,8 +237,7 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <NavBar>
-        </NavBar>
+        <NavBar />
         <NumberInputView
           autoFocus={false}
           numberBase={2}
