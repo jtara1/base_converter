@@ -1,6 +1,21 @@
 import React, { Component } from 'react';
-import { AppRegistry, StyleSheet, Text, View, TextInput } from 'react-native';
+import { AppRegistry, StyleSheet, Text, View, TextInput, Button } from 'react-native';
 import _ from 'lodash';
+
+class NavBar extends Component {
+  render() {
+    return(
+      <View style={styles.navBar}>
+          <Text style={styles.title}>Base Converter</Text>
+          <Button 
+            title="      Clear      " 
+            style={styles.clearButton}
+            onPress={NumberInputView.clearAllText}
+          />
+      </View>
+    );
+  }
+}
 
 /**
  * Renders a view that contains an input field that will filter
@@ -9,6 +24,9 @@ import _ from 'lodash';
  * Instances are associated with a specific numberBase.
  */
 class NumberInputView extends Component {
+
+  // region: static //
+
   // map numberBase to label
   static labels = {
     2: "Bin",
@@ -30,6 +48,19 @@ class NumberInputView extends Component {
         _.range(26), 
         (x) => x + 65),
       (x) => String.fromCharCode(x)));
+  /**
+   * Change the text of each of the TextInput within each NumberInputView
+   * to that of the empty string.
+   */
+  static clearAllText() {
+    for (numberBase in NumberInputView.inputViews) {
+      NumberInputView.inputViews[numberBase].setState((prevState, props) => {
+        return {text: ''};
+      });
+    }
+  }
+
+  // endregion //
 
   constructor(props) {
     super(props);
@@ -42,10 +73,13 @@ class NumberInputView extends Component {
     NumberInputView.inputViews[this.props.numberBase] = this;
 
     // used in regex pattern that matches non-accepted characters
-    this.validDigits = NumberInputView.alphanumericCharacters
+    validDigits = NumberInputView.alphanumericCharacters
       .slice(0, this.props.numberBase)
       .join('');
-    console.log(this.validDigits);
+    console.log(validDigits);
+
+    // match all characters that are not valid digits for this numberBase
+    this.unAcceptedCharacterRegex = new RegExp("[^" + validDigits + "]*", "g");
   }
 
   /**
@@ -56,8 +90,7 @@ class NumberInputView extends Component {
     input = input.toUpperCase();
     console.log('input: ' + input);
     
-    let pattern = new RegExp("[^" + this.validDigits + "]*", 'g');
-    let filteredInput = input.replace(pattern, "");
+    let filteredInput = input.replace(this.unAcceptedCharacterRegex, "");
     return filteredInput;
   }
 
@@ -90,10 +123,10 @@ class NumberInputView extends Component {
                 let convertedValue = this.state.text === '' ? 
                   '':
                   NumberConverter.convert(
-                  this.state.text,
-                  this.props.numberBase,
-                  toBase
-                  ).toString().toUpperCase();
+                    this.state.text,
+                    this.props.numberBase,
+                    toBase
+                    ).toString().toUpperCase();
                   
                 console.log('---debug---');
                 console.log('converting value: ' + this.state.text);
@@ -161,9 +194,8 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.navBar}>
-          <Text style={styles.title}>Base Converter</Text>
-        </View>
+        <NavBar>
+        </NavBar>
         <NumberInputView
           autoFocus={false}
           numberBase={2}
@@ -188,18 +220,33 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 0,
+    margin: 0,
+    borderRadius: 0,
+    borderWidth: 0,
   },
 
   navBar: {
     flex: 0.15,
-    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     backgroundColor: 'steelblue'
   },
 
   // title within navBar
   title: {
-    fontSize: 24,
-    textAlign: 'center',
+    flex: 1,
+    fontSize: 30,
+    lineHeight: 150,
+    textAlignVertical: 'center',
+    alignSelf: 'flex-start',
+    paddingLeft: 20,
+  },
+
+  // clear button within navBar
+  clearButton: {
+    flex: 1,
+    width: 150,
+    height: 200,
   },
 
   // view of each input section
@@ -209,8 +256,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'lightblue',
-    borderRadius: 0,
-    padding: 0,
     marginTop: 10,
   },
 
@@ -220,8 +265,6 @@ const styles = StyleSheet.create({
     lineHeight: 150,
     flex: 0.3,
     textAlign: 'center',
-    padding: 0,
-    margin: 0,
     backgroundColor: 'skyblue',
     borderRadius: 10
   },
