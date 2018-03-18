@@ -8,7 +8,7 @@ class NavBar extends Component {
       <View style={styles.navBar}>
           <Text style={styles.title}>Base Converter</Text>
           <Button 
-            title="      Clear      " 
+            title={"        Clear        "} // make the button wider
             style={styles.clearButton}
             onPress={NumberInputView.clearAllText}
           />
@@ -39,7 +39,7 @@ class NumberInputView extends Component {
   // e.g.: { 2: binaryNumberInputViewObject }
   static inputViews = {};
   
-  // [0, 1, ..., 9, A, B, C, ..., Z]
+  // [0, 1, ..., 9, Aa, Bb, Cc, ..., Zz]
   static alphanumericCharacters = _.concat(
     _.range(10), 
     // English alphabet [A, B, C, ..., Z] is 26 characters
@@ -47,7 +47,8 @@ class NumberInputView extends Component {
       _.map(
         _.range(26), 
         (x) => x + 65),
-      (x) => String.fromCharCode(x)));
+      (x) => String.fromCharCode(x) + String.fromCharCode(x + 32)));
+
   /**
    * Change the text of each of the TextInput within each NumberInputView
    * to that of the empty string.
@@ -87,9 +88,7 @@ class NumberInputView extends Component {
    * @returns {string} input with removed unaccepted characters
    */
   filterInput(input) {
-    input = input.toUpperCase();
-    console.log('input: ' + input);
-    
+    // console.log('input: ' + input);
     let filteredInput = input.replace(this.unAcceptedCharacterRegex, "");
     return filteredInput;
   }
@@ -105,11 +104,9 @@ class NumberInputView extends Component {
           placeholderTextColor={"#000000"}
           value={this.state.text}
           keyboardType={this.keyboardType}
-          onChangeText={(text) => this.setState(
+          onChangeText={(newText) => this.setState(
             state=(prevState, props) => {
-              let filteredInput = this.filterInput(text);
-              console.log('filteredInput: ' + filteredInput);
-              return {text: filteredInput};
+              return {text: this.filterInput(newText)};
             },
             callback=() => {
               for (toBase in NumberInputView.inputViews) {
