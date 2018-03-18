@@ -49,6 +49,9 @@ class NumberInputView extends Component {
         (x) => x + 65),
       (x) => String.fromCharCode(x) + String.fromCharCode(x + 32)));
 
+  // group 1 matches a floating point number with decimal, group two is decimal point
+  static floatingPointRegex = /(.*\..*)(\..*)/;
+
   /**
    * Change the text of each of the TextInput within each NumberInputView
    * to that of the empty string.
@@ -88,9 +91,13 @@ class NumberInputView extends Component {
    * @returns {string} input with removed unaccepted characters
    */
   filterInput(input) {
-    // console.log('input: ' + input);
-    let filteredInput = input.replace(this.unAcceptedCharacterRegex, "");
-    return filteredInput;
+    // check if there's more than one decimal point
+    let matches = NumberInputView.floatingPointRegex.exec(input);
+    if (matches !== null) {
+      input = matches[1]; // group 1 of the match
+    }
+
+    return input.replace(this.unAcceptedCharacterRegex, "");
   }
 
   render() {
@@ -236,7 +243,7 @@ export default class App extends Component {
       <View style={styles.container}>
         <NavBar />
         <NumberInputView
-          autoFocus={false}
+          autoFocus={true}
           numberBase={2}
         />
         <NumberInputView
@@ -246,7 +253,7 @@ export default class App extends Component {
           numberBase={10}
         />
         <NumberInputView
-          autoFocus={true}
+          autoFocus={false}
           numberBase={16}
         />
       </View>
