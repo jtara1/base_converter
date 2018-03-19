@@ -1,7 +1,84 @@
 import React, { Component } from 'react';
-import { AppRegistry, StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { AppRegistry, StyleSheet, Text, View, TextInput, Button, Alert, FlatList } from 'react-native';
 import Hamburger from 'react-native-hamburger';
 import _ from 'lodash';
+
+class HamburgerMenu extends Component {
+  static instances = [];
+
+  static get instance() {
+    return HamburgerMenu.instances[0];
+  }
+
+  static listItemsInfo = {
+    About: 'Created using React Native \n' +
+      'by jtara1 \n' +
+      'source code and github repo: base_converter',
+    Donate: 'Contact github.com/jtara1'
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      enabled: false,
+      listItems: [
+        {key: 'About'},
+        {key: 'Donate'}
+      ]
+    };
+
+    HamburgerMenu.instances.push(this);
+  }
+
+  alertForItem(itemValue) {
+    // params: title, message, list of button options, cancelable
+    Alert.alert(
+      itemValue,
+      HamburgerMenu.listItemsInfo[itemValue],
+      [
+        {text: 'Ok', onPress: () => {}},
+      ],
+      {cancelable: false}
+    );
+  }
+
+  render() {
+    if (this.state.enabled) {
+      return(
+        <View style={{
+          justifyContent: 'center',
+          flex: 1,
+          margin: 10,
+          position: 'absolute',
+          backgroundColor: 'white',
+          right: 0,
+          top: "14%",
+          zIndex: 10,
+        }}
+        >
+          <FlatList
+            data={this.state.listItems}
+            renderItem={({item}) => 
+              <Text 
+                style={{
+                  fontSize: 20,
+                  padding: 10,
+                }}
+                onPress={() => { 
+                  this.alertForItem(item.key);
+                }}
+              >
+                {item.key}
+              </Text>
+            }
+          />
+        </View>
+      );
+    }
+    // render nothing for this component
+    return null;
+  }
+}
 
 class NavBar extends Component {
   constructor(props) {
@@ -21,8 +98,12 @@ class NavBar extends Component {
           <Hamburger
             style={styles.hamburgerButton}
             active={this.state.active}
-            type="arrow"
-            onPress={() => this.setState({active: !this.state.active})}
+            type="cross"
+            onPress={() => {
+              this.setState({active: !this.state.active});
+              // if (HamburgerMenu.instance !== null || HamburgerMenu.instance != 'undefined')
+              HamburgerMenu.instance.setState({enabled: !this.state.active});
+            }}
           />
       </View>
     );
@@ -254,6 +335,8 @@ export default class App extends Component {
     return (
       <View style={styles.container}>
         <NavBar />
+        <HamburgerMenu />
+
         <NumberInputView
           autoFocus={true}
           numberBase={2}
