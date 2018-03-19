@@ -1,16 +1,28 @@
 import React, { Component } from 'react';
 import { AppRegistry, StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import Hamburger from 'react-native-hamburger';
 import _ from 'lodash';
 
 class NavBar extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {active: false};
+  }
+
   render() {
     return(
       <View style={styles.navBar}>
           <Text style={styles.title}>Base Converter</Text>
           <Button 
-            title={"        Clear        "} // make the button wider
+            title={"     Clear     "} // make the button wider
             style={styles.clearButton}
             onPress={NumberInputView.clearAllText}
+          />
+          <Hamburger
+            style={styles.hamburgerButton}
+            active={this.state.active}
+            type="arrow"
+            onPress={() => this.setState({active: !this.state.active})}
           />
       </View>
     );
@@ -275,17 +287,15 @@ const styles = StyleSheet.create({
     flex: 0.15,
     flexDirection: 'row',
     alignItems: 'flex-end',
+    alignContent: 'flex-start',
+    justifyContent: 'space-around',
     backgroundColor: 'steelblue'
   },
 
   // title within navBar
   title: {
-    flex: 1,
+    flex: 0.75,
     fontSize: 30,
-    lineHeight: 150,
-    textAlignVertical: 'center',
-    alignSelf: 'flex-start',
-    paddingLeft: 20,
   },
 
   // clear button within navBar
@@ -293,6 +303,10 @@ const styles = StyleSheet.create({
     flex: 1,
     width: 150,
     height: 200,
+  },
+
+  hamburgerButton: {
+    flex: 1,
   },
 
   // view of each input section
