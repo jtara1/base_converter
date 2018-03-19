@@ -1,7 +1,15 @@
 import React, { Component } from 'react';
-import { AppRegistry, StyleSheet, Text, View, TextInput, Button, Alert, FlatList } from 'react-native';
+import { AppRegistry, StyleSheet, Text, View, TextInput, Button, Alert, FlatList, Linking } from 'react-native';
 import Hamburger from 'react-native-hamburger';
 import _ from 'lodash';
+
+class PaypalDonationButton extends Component {
+  render() {
+    return(
+      <p>{"Hello there"}</p>
+    )
+  }
+}
 
 class HamburgerMenu extends Component {
   static instances = [];
@@ -14,7 +22,21 @@ class HamburgerMenu extends Component {
     About: 'Created using React Native \n' +
       'by jtara1 \n' +
       'source code and github repo: base_converter',
-    Donate: 'Contact github.com/jtara1'
+    // $1 donation button
+    // Donate: 'https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=XJR3MNT7EL4YQ&lc=US&item_name=base_converter&amount=1%2e00&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted',
+    Donate: 'https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=XJR3MNT7EL4YQ&lc=US&item_name=base_converter%20by%20jtara1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted',
+    Failed: 'An error occurred',
+  }
+
+  static itemClickCallbacks = {
+    About: () => { HamburgerMenu.alertForItem('About'); },
+    Donate: () => { 
+      let url = HamburgerMenu.listItemsInfo['Donate'];
+      if (Linking.canOpenURL(url))
+        Linking.openURL(url); 
+      else
+      HamburgerMenu.alertForItem('Failed')
+    },
   }
 
   constructor(props) {
@@ -30,7 +52,7 @@ class HamburgerMenu extends Component {
     HamburgerMenu.instances.push(this);
   }
 
-  alertForItem(itemValue) {
+  static alertForItem(itemValue) {
     // params: title, message, list of button options, cancelable
     Alert.alert(
       itemValue,
@@ -65,7 +87,7 @@ class HamburgerMenu extends Component {
                   padding: 10,
                 }}
                 onPress={() => { 
-                  this.alertForItem(item.key);
+                  HamburgerMenu.itemClickCallbacks[item.key]();
                 }}
               >
                 {item.key}
@@ -335,6 +357,7 @@ export default class App extends Component {
     return (
       <View style={styles.container}>
         <NavBar />
+        {/* FlatList that drops down when Hamburger button is pressed */}
         <HamburgerMenu />
 
         <NumberInputView
