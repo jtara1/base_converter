@@ -6,10 +6,10 @@
     "slug": "base-converter",
     "sdkVersion": "25.0.0",
     "ios": {
-      "bundleIdentifier": "io.github.jtara1.base-converter"
+      "bundleIdentifier": "io.github.jtara1.baseconverter"
     },
     "android": {
-      "package": "io.github.jtara1.base-converter"
+      "package": "io.github.jtara1.baseconverter"
     }
    }
  }
