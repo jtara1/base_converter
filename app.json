@@ -2,7 +2,7 @@
    "expo": {
     "name": "Base Converter",
     "icon": "./images/app-icon.png",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "slug": "base-converter",
     "sdkVersion": "25.0.0",
     "ios": {
