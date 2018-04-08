@@ -45,7 +45,7 @@ class HamburgerMenu extends Component {
       enabled: false,
       listItems: [
         {key: 'About'},
-        {key: 'Donate'}
+        // {key: 'Donate'}
       ]
     };
 
