@@ -1,6 +1,6 @@
 {
   "name": "base_converter",
-  "version": "0.1.0",
+  "version": "1.0.3",
   "private": true,
   "devDependencies": {
     "jest-expo": "25.0.0",
@@ -19,6 +19,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "exp": "^51.4.0",
     "expo": "^25.0.0",
     "lodash": "*",
     "react": "16.2.0",
