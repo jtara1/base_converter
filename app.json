@@ -2,14 +2,15 @@
    "expo": {
     "name": "Base Converter",
     "icon": "./images/app-icon.png",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "slug": "base-converter",
     "sdkVersion": "25.0.0",
     "ios": {
       "bundleIdentifier": "io.github.jtara1.baseconverter"
     },
     "android": {
-      "package": "io.github.jtara1.baseconverter"
+      "package": "io.github.jtara1.baseconverter",
+      "versionCode": 2
     }
    }
  }
